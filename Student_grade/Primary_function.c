@@ -265,6 +265,7 @@ int main(void)
 
 		break;
 	case '2':
+		//begin to delete student by StudentId
 		break;
 	case '3':
 		break;
