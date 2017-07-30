@@ -1,6 +1,6 @@
 #pragma once
 
-typedef struct {
+typedef struct Primary_Student {
 	float chineseGrade;
 	float mathGrade;
 	float englishGrade;
@@ -10,6 +10,6 @@ typedef struct {
 	char studentName[24];
 } Primary_Student;
 
-typedef struct {
+typedef struct Student_List {
 	Primary_Student* stuNode;
-};
+} Student_List;
