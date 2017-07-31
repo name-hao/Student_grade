@@ -20,6 +20,11 @@ bool init_Student_List()
 
 bool add_Student(Student* init)
 {
+	if (query_Student_by_Id(init->studentId))
+	{
+		printf("Student %s already exists. Please Re-enter anothor. \n\n", init->studentId);
+		return false;
+	}
 	Student* tmp_student = NULL;
 	tmp_student = (Student*)malloc(sizeof(Student));
 	if (tmp_student)
@@ -29,6 +34,7 @@ bool add_Student(Student* init)
 		{
 			all_Student.head = tmp_student;
 			all_Student.tail = tmp_student;
+			++all_Student.size;
 		}
 		else 
 		{
@@ -52,9 +58,34 @@ bool delete_Student(char student_Id[11])
 	Student* prev = NULL;
 	Student* current = NULL;
 	if (strcmp(all_Student.head->studentId, student_Id) != 0)
-	{
+	{	
 		current = all_Student.head->next;
 		prev = all_Student.head;
+		while (strcmp(current->studentId, student_Id) != 0)
+		{
+			prev = prev->next;
+			if (current->next == NULL) {
+				printf("There is no Student which id is %s\n", student_Id);
+				current = all_Student.tail;
+				return false;
+			}
+			current = current->next;
+		}
+		if (current == all_Student.tail)
+		{
+			free(prev->next);
+			--all_Student.size;
+			printf("Delete %s success", student_Id);
+			prev->next = NULL;
+		}
+		else
+		{
+			prev->next = current->next;
+			free(current);
+			--all_Student.size;
+			printf("Delete %s success", student_Id);
+		}
+		return true;
 	}
 	else 
 	{
@@ -62,39 +93,23 @@ bool delete_Student(char student_Id[11])
 		all_Student.head = temp->next;
 		free(temp);
 		--all_Student.size;
-	}
-	while (strcmp(current->studentId, student_Id) != 0)
-	{
-		prev = prev->next;
-		if (current->next == NULL) {
-			printf("There is no Student which id is %s", student_Id);
-			current = all_Student.tail;
-			return false;
-		}
-		current = current->next;			
-	}
-	if (current == all_Student.tail)
-	{
-		free(prev->next);
 		printf("Delete %s success", student_Id);
-		prev->next = NULL;
+		return true;
 	}
-	else
-	{
-		prev->next = current->next;
-		free(current);
-		printf("Delete %s success", student_Id);
-	}
-	return true;
+	
 }
 
 bool edit_Student(char student_Id[11], Student* new_Student)
 {
 	Student* temp = query_Student_by_Id(student_Id);
+	
 	if (temp != NULL)
 	{
+		Student* prevNext = temp->next;
 		memcpy(temp, new_Student, sizeof(Student));
+		temp->next = prevNext;
 	}
+
 	else
 	{
 		printf("There is no one student which Stu_Id is %s.", student_Id);
@@ -104,6 +119,10 @@ bool edit_Student(char student_Id[11], Student* new_Student)
 
 Student* query_Student_by_Id(char student_Id[11])
 {
+	if (all_Student.size == 0)
+	{
+		return NULL;
+	}
 	Student* temp = all_Student.head;
 	while (strcmp(temp->studentId, student_Id) != 0)
 	{
@@ -138,29 +157,48 @@ void delete_Student_List()
 	{
 		printf("There is no one to delete.\n");
 	}
-	Student* temp = all_Student.head;
+	long long deleted = 0, count = all_Student.size;
+	Student* temp = NULL;
 	while (all_Student.head != NULL)
 	{
+		temp = all_Student.head;
 		all_Student.head = temp->next;
 		free(temp);
 		--all_Student.size;
+		++deleted;
 	}
-	printf("Delete Success!\n");
+	if (deleted == count) {
+		printf("Delete Success!\n");
+		printf("\n------------------------------\n");
+		return;
+	}
+	printf("Something happend wrong.\n");
 	printf("\n------------------------------\n");
 }
 
 void show_all_Student()
 {
-	Student* temp = all_Student.head;
-	while (temp->next != NULL)
+	printf("----------------All Students--------------------\n");
+	if (all_Student.size == 0)
 	{
-		show_all_Student(temp);
+		printf("There is no any student.\n");
+		return;
+	}
+	Student* temp = all_Student.head;
+	while (temp != NULL)
+	{
+		show_single_Student(temp);
 		temp = temp->next;
 	}
 }
 
 void show_single_Student(Student* stu)
 {
+	if (stu == NULL)
+	{
+		printf("There is no one.\n");
+		return;
+	}
 	printf("------------------------------------\n");
 	printf("StudentId    : %s\n", stu->studentId);
 	printf("MajorName    : %s\n", stu->majorName);

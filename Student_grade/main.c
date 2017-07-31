@@ -2,13 +2,14 @@
 #include "Primary_function.h"
 
 Student temp_Student = {
-	.chineseGrade = (float)0,
-	.mathGrade = (float)0,
-	.englishGrade = (float)0,
-	.studentId = { "a" },
-	.majorName = { "a" },
-	.classNumber = { "a" },
-	.studentName = { "a" }
+	.chineseGrade = (float)97,
+	.mathGrade = (float)98,
+	.englishGrade = (float)99,
+	.studentId = { "2012001234" },
+	.majorName = { "Computer Science" },
+	.classNumber = { "1201" },
+	.studentName = { "Cheng Hao" },
+	.next = NULL
 };
 char singleChar, sure;
 
@@ -231,19 +232,34 @@ int main(void)
 	printf("\t   2. Delete Student Grade.\n");
 	printf("\t\t\t   3. Edit Student Grade.");
 	printf("\t   4. query Student Grade.\n");
-	printf("     ---------------------------------------     "
-		   "5. Quit."
-		   "    ---------------------------------------\n\n"
+	printf("\t\t\t   5. Show All Student");
+	printf("\t\t   6. Exit.\n");
+	printf("     --------------------------------------------"
+		   "--------"
+		   "-------------------------------------------\n\n"
 	);
 all_Begin:
-	printf("Now enter your choice(1-5): ");
-	char myChoice = getchar();
-	pass_Redundancy_Character();
-	while (myChoice > '5' || myChoice < '0') {
-		printf("Invalid choice.\n");
-		printf("Now Re-enter your choice(1-5): _\b");
-		scanf("%c", &myChoice);
-		pass_Redundancy_Character();
+	printf("Now enter your choice(1-6): ");
+	
+	char myChoice ;
+	/*scanf("%c", &myChoice);
+	pass_Redundancy_Character();*/
+	while (1) {
+		myChoice = getchar();
+		if (myChoice == '\n')
+		{
+			continue;
+		}
+		if (myChoice > '6' || myChoice < '0')
+		{
+			printf("Invalid choice.\n");
+			printf("Now Re-enter your choice(1-6): _\b");
+			myChoice = getchar();
+			pass_Redundancy_Character();
+			continue;
+		}
+		break;
+		
 	}
 	int id_count = 0;
 	switch (myChoice)
@@ -266,7 +282,27 @@ all_Begin:
 		printf("Do you want to add it ? (Y or N) ");
 		if ((sure = getchar()) == 'Y')
 		{
-			add_Student(&temp_Student);
+			if (!add_Student(&temp_Student))
+			{
+				printf("Do you want to add another one ? (Y or N) ");
+				pass_Redundancy_Character();
+				if ((sure = getchar()) == 'Y')
+				{
+					goto add_Another_Student;
+				}
+			}
+			show_all_Student();
+			pass_Redundancy_Character();
+			printf("Do you want to add another one ? (Y or N) ");
+			if ((sure = getchar()) == 'Y')
+			{
+				goto add_Another_Student;
+			}
+			printf("\n\n------------------------------------\n");
+			printf("            Back to menu.\n");
+			printf("------------------------------------\n\n\n");
+			pass_Redundancy_Character();
+			goto all_Begin;
 		}
 		else
 		{
@@ -289,18 +325,49 @@ all_Begin:
 		get_Student_Id();
 		if (delete_Student(temp_Student.studentId))
 		{
-			printf("Delete %s Success\n", temp_Student.studentId);
+			//printf("Delete %s Success\n", temp_Student.studentId);
+		}
+		printf("\n\n------------------------------------\n");
+		printf("            Back to menu.\n");
+		printf("------------------------------------\n\n\n");
+		pass_Redundancy_Character();
+		goto all_Begin;
+		break;
+	case '3':
+		printf("\n\nEnter stu_Id you want to Edit: ");
+		get_Student_Info();
+		if (edit_Student(temp_Student.studentId, &temp_Student))
+		{
+			printf("Edit %s Success.\n", temp_Student.studentId);
+			show_single_Student(&temp_Student);
 		}
 		else
 		{
-			printf("Something happened wrong.");
+			printf("Something happened wrong.\n");
 		}
-		break;
-	case '3':
+		printf("\n\n------------------------------------\n");
+		printf("            Back to menu.\n");
+		printf("------------------------------------\n\n\n");
+		pass_Redundancy_Character();
+		goto all_Begin;
 		break;
 	case '4':
+		printf("\n\nEnter stu_Id you want to query: ");
+		get_Student_Id();
+		show_single_Student(query_Student_by_Id(temp_Student.studentId));
+		printf("\n\n------------------------------------\n");
+		printf("            Back to menu.\n");
+		printf("------------------------------------\n\n\n");
+		pass_Redundancy_Character();
+		goto all_Begin;
 		break;
 	case '5':
+		show_all_Student();
+		//printf("\n\n------------------------------------\n");
+		//printf("\n            Back to menu.\n");
+		printf("\n\n\n-----------------Back to menu-------------------\n");
+		goto all_Begin;
+	case '6':
 		break;
 	}
 	delete_Student_List();
